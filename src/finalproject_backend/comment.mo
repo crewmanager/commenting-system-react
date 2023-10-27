@@ -6,21 +6,6 @@ import List "mo:base/List";
 import Iter "mo:base/Iter";
 
 actor {
-  type loginInfo={
-    userEmail:Text;
-    userPassword:Text;
-  };
-  type UserInfo = {
-    userName : Text;
-    userEmail : Text;
-    userPassword : Text;
-  };
-  type storedUserInfo = {
-    userName : Text;
-    userEmail : Text;
-    userPassword : Text;
-  };
-
   type CommentInfo = {
     commentText : Text;
     CommentId : Text;
@@ -35,59 +20,8 @@ actor {
     userActions : [Text];
   };
 
-  var map = HashMap.HashMap<Text, UserInfo>(0, Text.equal, Text.hash);
   var Comments = HashMap.HashMap<Text, CommentInfo>(0, Text.equal, Text.hash);
   var lastCommentId = 0;
-
- public func signUp(userEmail : Text, Info : UserInfo) : async Text {
-    if (map.get(userEmail) != null) {
-      return "User with this email already exists. Please log in instead.";
-    };
-
-    let userInfo : UserInfo = {
-      userName = Info.userName;
-      userEmail = Info.userEmail;
-      userPassword = Info.userPassword;
-    };
-
-    map.put(userEmail, userInfo);
-    return "User successfully registered";
-  };
-  public func fetchuser(userEmail : Text) : async UserInfo {
-
-    let data : UserInfo = switch (map.get(userEmail)) {
-      case (?value) { value };
-
-      case (null) { throw Error.reject("user is not registered") };
-    };
-    return data;
-  };
-
-  public func login(userEmail : Text, loginInfo : loginInfo) : async Text {
-    let storedUserInfo = await fetchuser(userEmail);
-
-    if (Text.equal(loginInfo.userEmail, storedUserInfo.userEmail) and Text.equal(loginInfo.userPassword, storedUserInfo.userPassword)) {
-      return "Login success";
-    } else {
-      throw Error.reject("Invalid user credentials");
-    };
-  };
-
-  public func updatePassword(userEmail : Text, Info : UserInfo) : async () {
-
-    let userInfo : UserInfo = {
-      userName = Info.userName;
-      userEmail = Info.userEmail;
-      userPassword = Info.userPassword;
-    };
-    ignore map.replace(userEmail, userInfo);
-  };
-
-  public func deleteData(userEmail : Text) : async Text {
-
-    map.delete(userEmail);
-    return "user deleted";
-  };
 
   public func createComment(info : Commentget) : async Text {
     lastCommentId += 1;
@@ -105,7 +39,7 @@ actor {
     };
 
     Comments.put(uniqueID, comment);
-    return "Comment successfully created with ID: " # uniqueID;
+    return "Comment successfully created";
   };
 
   public query func getCommentByCommentId(commentId : Text) : async CommentInfo {
